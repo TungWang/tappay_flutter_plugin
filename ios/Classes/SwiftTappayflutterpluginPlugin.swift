@@ -55,7 +55,7 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
             TPDSetup.shareInstance().serverSync()
 
             let card = TPDCard.setWithCardNumber(cardNumber, withDueMonth: dueMonth, withDueYear: dueYear, withCCV: ccv)
-            card.onSuccessCallback { (tpPrime, cardInfo) in
+            card.onSuccessCallback { (tpPrime, cardInfo, cardIdentifier) in
                 if let tpPrime = tpPrime {
                     prime(tpPrime)
                 }

@@ -21,9 +21,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> getPrime() async {
+
+    //Input your app id
     final int appId = 0;
+    //Input your app key
     final String appKey = '';
     final String serverType = 'sandBox';
+    //Test card number
     final String cardNumber = '4242424242424242';
     final String dueMonth = '01';
     final String dueYear = '23';
