@@ -1,3 +1,13 @@
+## 0.0.7
+
+* Fix getPrime parse failCallBack error
+
+
+## 0.0.6
+
+* Fix PrimeModel json decode error
+
+
 ## 0.0.5
 
 * Update setupTappay method.

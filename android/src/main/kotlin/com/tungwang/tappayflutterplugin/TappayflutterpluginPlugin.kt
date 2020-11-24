@@ -76,61 +76,11 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
           getPrime(cardNumber, dueMonth, dueYear, ccv, prime = {
             result.success(it)
           }, failCallBack = {
-            result.error("", it,"")
+            result.success(it)
           })
         }
       }
     }
-
-
-
-//    if (call.method == "getPlatformVersion") {
-//      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-//    } else if (call.method == "setupTappay") {
-//
-//      if (context == null) {
-//        result.error("", "context is null", "")
-//      }else{
-//
-//        val appId: Int? = call.argument("appId")
-//        val appKey: String? = call.argument("appKey")
-//        val serverType: String? = call.argument("serverType")
-//        setupTappay(appId, appKey, serverType, errorMessage = {result.error("", it, "")})
-//
-////        val cardNumber: String? = call.argument("cardNumber")
-////        val dueMonth: String? = call.argument("dueMonth")
-////        val dueYear: String? = call.argument("dueYear")
-////        val ccv: String? = call.argument("ccv")
-////
-////        if (appId != null && appKey != null && serverType != null && cardNumber != null && dueMonth != null && dueYear != null && ccv != null) {
-////
-////          var st: TPDServerType = TPDServerType.Sandbox
-////          if (serverType != "sandBox") {
-////            st = TPDServerType.Production
-////          }
-////
-////          TPDSetup.initInstance(context, appId, appKey, st)
-////
-////          val cn = StringBuffer(cardNumber)
-////          val dm = StringBuffer(dueMonth)
-////          val dy = StringBuffer(dueYear)
-////          val cv = StringBuffer(ccv)
-////          val card = TPDCard(context, cn, dm, dy, cv).onSuccessCallback { prime, _, _ ->
-////            result.success(prime)
-////          }.onFailureCallback { status, message ->
-////            result.error(status.toString(), message, "errorDetail")
-////          }
-////          card.createToken("Unknown")
-////
-////        }else{
-////          result.error("", "something is null", "")
-////        }
-//
-//      }
-//
-//    } else {
-//      result.notImplemented()
-//    }
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
@@ -197,7 +147,7 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       val dy = StringBuffer(dueYear)
       val cv = StringBuffer(ccv)
       val card = TPDCard(context, cn, dm, dy, cv).onSuccessCallback { tpPrime, _, _ ->
-        prime(tpPrime)
+        prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"$tpPrime\"}")
       }.onFailureCallback { status, message ->
         failCallBack("{\"status\":\"$status\", \"message\":\"$message\", \"prime\":\"\"}")
       }
