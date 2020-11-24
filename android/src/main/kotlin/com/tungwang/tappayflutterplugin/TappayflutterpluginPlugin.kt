@@ -9,6 +9,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import tech.cherri.tpdirect.api.TPDCard
+import tech.cherri.tpdirect.api.TPDCardValidationResult
 import tech.cherri.tpdirect.api.TPDServerType
 import tech.cherri.tpdirect.api.TPDSetup
 
@@ -40,53 +41,168 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
 
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    } else if (call.method == "setupTappay") {
-
-      if (context == null) {
-        result.error("", "context is null", "")
-      }else{
-
-        val appId: Int? = call.argument("appId")
-        val appKey: String? = call.argument("appKey")
-        val serverType: String? = call.argument("serverType")
-        val cardNumber: String? = call.argument("cardNumber")
-        val dueMonth: String? = call.argument("dueMonth")
-        val dueYear: String? = call.argument("dueYear")
-        val ccv: String? = call.argument("ccv")
-
-        if (appId != null && appKey != null && serverType != null && cardNumber != null && dueMonth != null && dueYear != null && ccv != null) {
-
-          var st: TPDServerType = TPDServerType.Sandbox
-          if (serverType != "sandBox") {
-            st = TPDServerType.Production
-          }
-
-          TPDSetup.initInstance(context, appId, appKey, st)
-
-          val cn = StringBuffer(cardNumber)
-          val dm = StringBuffer(dueMonth)
-          val dy = StringBuffer(dueYear)
-          val cv = StringBuffer(ccv)
-          val card = TPDCard(context, cn, dm, dy, cv).onSuccessCallback { prime, _, _ ->
-            result.success(prime)
-          }.onFailureCallback { status, message ->
-            result.error(status.toString(), message, "errorDetail")
-          }
-          card.createToken("Unknown")
-
+    when (call.method) {
+      in "setupTappay" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
         }else{
-          result.error("", "something is null", "")
+          val appId: Int? = call.argument("appId")
+          val appKey: String? = call.argument("appKey")
+          val serverType: String? = call.argument("serverType")
+          setupTappay(appId, appKey, serverType, errorMessage = {result.error("", it, "")})
         }
-
       }
 
-    } else {
-      result.notImplemented()
+      in "isCardValid" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        }else{
+          val cardNumber: String? = call.argument("cardNumber")
+          val dueMonth: String? = call.argument("dueMonth")
+          val dueYear: String? = call.argument("dueYear")
+          val ccv: String? = call.argument("ccv")
+          result.success(isCardValid(cardNumber, dueMonth, dueYear, ccv))
+        }
+      }
+
+      in "getPrime" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        }else{
+          val cardNumber: String? = call.argument("cardNumber")
+          val dueMonth: String? = call.argument("dueMonth")
+          val dueYear: String? = call.argument("dueYear")
+          val ccv: String? = call.argument("ccv")
+          getPrime(cardNumber, dueMonth, dueYear, ccv, prime = {
+            result.success(it)
+          }, failCallBack = {
+            result.error("", it,"")
+          })
+        }
+      }
     }
+
+
+
+//    if (call.method == "getPlatformVersion") {
+//      result.success("Android ${android.os.Build.VERSION.RELEASE}")
+//    } else if (call.method == "setupTappay") {
+//
+//      if (context == null) {
+//        result.error("", "context is null", "")
+//      }else{
+//
+//        val appId: Int? = call.argument("appId")
+//        val appKey: String? = call.argument("appKey")
+//        val serverType: String? = call.argument("serverType")
+//        setupTappay(appId, appKey, serverType, errorMessage = {result.error("", it, "")})
+//
+////        val cardNumber: String? = call.argument("cardNumber")
+////        val dueMonth: String? = call.argument("dueMonth")
+////        val dueYear: String? = call.argument("dueYear")
+////        val ccv: String? = call.argument("ccv")
+////
+////        if (appId != null && appKey != null && serverType != null && cardNumber != null && dueMonth != null && dueYear != null && ccv != null) {
+////
+////          var st: TPDServerType = TPDServerType.Sandbox
+////          if (serverType != "sandBox") {
+////            st = TPDServerType.Production
+////          }
+////
+////          TPDSetup.initInstance(context, appId, appKey, st)
+////
+////          val cn = StringBuffer(cardNumber)
+////          val dm = StringBuffer(dueMonth)
+////          val dy = StringBuffer(dueYear)
+////          val cv = StringBuffer(ccv)
+////          val card = TPDCard(context, cn, dm, dy, cv).onSuccessCallback { prime, _, _ ->
+////            result.success(prime)
+////          }.onFailureCallback { status, message ->
+////            result.error(status.toString(), message, "errorDetail")
+////          }
+////          card.createToken("Unknown")
+////
+////        }else{
+////          result.error("", "something is null", "")
+////        }
+//
+//      }
+//
+//    } else {
+//      result.notImplemented()
+//    }
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+  }
+
+  //設置Tappay環境
+  private fun setupTappay(appId: Int?, appKey: String?, serverType: String?, errorMessage: (String) -> (Unit)) {
+    var message = ""
+
+    if (appId == 0 || appId == null) {
+      message += "appId error"
+    }
+
+    if (appKey.isNullOrEmpty()) {
+      message += "/appKey error"
+    }
+
+    if (serverType.isNullOrEmpty()) {
+      message += "/serverType error"
+    }
+
+    if (message.isNotEmpty()) {
+      errorMessage(message)
+      return
+    }
+
+    val st: TPDServerType = if (serverType == "sandBox") (TPDServerType.Sandbox) else (TPDServerType.Production)
+
+    TPDSetup.initInstance(context, appId!!, appKey, st)
+  }
+
+  //檢查信用卡的有效性
+  private fun isCardValid(cardNumber: String?, dueMonth: String?, dueYear: String?, ccv: String?): Boolean {
+
+    if (cardNumber.isNullOrEmpty()) {
+      return false
+    }
+
+    if (dueMonth.isNullOrEmpty()) {
+      return false
+    }
+
+    if (dueYear.isNullOrEmpty()) {
+      return false
+    }
+
+    if (ccv.isNullOrEmpty()) {
+      return false
+    }
+
+    val result = TPDCard.validate(StringBuffer(cardNumber), StringBuffer(dueMonth), StringBuffer(dueYear), StringBuffer(ccv))
+
+    return result.isCCVValid && result.isCardNumberValid && result.isExpiryDateValid
+  }
+
+  //取得Prime
+  private fun getPrime(cardNumber: String?, dueMonth: String?, dueYear: String?, ccv: String?, prime: (String) -> (Unit), failCallBack: (String) -> (Unit)) {
+
+    if (cardNumber == null || dueMonth == null || dueYear == null || ccv == null) {
+      failCallBack("{\"status\":\"\", \"message\":\"something is null\", \"prime\":\"\"}")
+    }else{
+      val cn = StringBuffer(cardNumber)
+      val dm = StringBuffer(dueMonth)
+      val dy = StringBuffer(dueYear)
+      val cv = StringBuffer(ccv)
+      val card = TPDCard(context, cn, dm, dy, cv).onSuccessCallback { tpPrime, _, _ ->
+        prime(tpPrime)
+      }.onFailureCallback { status, message ->
+        failCallBack("{\"status\":\"$status\", \"message\":\"$message\", \"prime\":\"\"}")
+      }
+      card.createToken("Unknown")
+    }
+
   }
 }
