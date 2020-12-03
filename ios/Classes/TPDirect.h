@@ -15,7 +15,7 @@ FOUNDATION_EXPORT const unsigned char TPDirectVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <TPDirect/PublicHeader.h>
 
-#import <TPDirect/TPDSetup.h>
+#import "TPDirect/TPDSetup.h"
 #import <TPDirect/TPDCard.h>
 #import <TPDirect/TPDCardInfo.h>
 #import <TPDirect/TPDForm.h>
@@ -29,6 +29,9 @@ FOUNDATION_EXPORT const unsigned char TPDirectVersionString[];
 #import <TPDirect/TPDCardValidationResult.h>
 #import <TPDirect/TPDLinePay.h>
 #import <TPDirect/TPDLinePayResult.h>
-
+#import <TPDirect/TPDJKOPay.h>
+#import <TPDirect/TPDJKOPayResult.h>
+#import <TPDirect/TPDEasyWallet.h>
+#import <TPDirect/TPDEasyWalletResult.h>
 
 
