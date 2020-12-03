@@ -1,11 +1,16 @@
+## 0.0.8
+
+* Add Easy Wallet support on iOS.
+
+
 ## 0.0.7
 
-* Fix getPrime parse failCallBack error
+* Fix getPrime parse failCallBack error.
 
 
 ## 0.0.6
 
-* Fix PrimeModel json decode error
+* Fix PrimeModel json decode error.
 
 
 ## 0.0.5

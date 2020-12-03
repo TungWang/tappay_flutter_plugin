@@ -35,6 +35,16 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
                 result(message)
             }
             
+        case "isEasyWalletAvailable":
+            result(isEasyWalletAvailable())
+            
+        case "getEasyWalletPrime":
+            getEasyWalletPrime(args: args) { (prime) in
+                result(prime)
+            } failCallBack: { (message) in
+                result(message)
+            }
+            
         default:
             result("iOS " + UIDevice.current.systemVersion)
         }
@@ -104,12 +114,36 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         let ccv = (args["ccv"] as? String ?? "")
         
         let card = TPDCard.setWithCardNumber(cardNumber, withDueMonth: dueMonth, withDueYear: dueYear, withCCV: ccv)
-        card.onSuccessCallback { (tpPrime, cardInfo, cardIdentifier) in
+        card.onSuccessCallback { (tpPrime, cardInfo, cardIdentifier, merchantReferenceInfo) in
             if let tpPrime = tpPrime {
                 prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"\(tpPrime)\"}")
             }
         }.onFailureCallback { (status, message) in
             failCallBack("{\"status\":\"\(status)\", \"message\":\"\(message)\", \"prime\":\"\"}")
         }.createToken(withGeoLocation: "UNKNOWN")
+    }
+    
+    //檢查是否有安裝Easy wallet
+    fileprivate func isEasyWalletAvailable() -> Bool {
+        return TPDEasyWallet.isEasyWalletAvailable()
+    }
+    
+    //取得Easy wallet prime
+    fileprivate func getEasyWalletPrime(args: [String:Any], prime: @escaping(String) -> Void, failCallBack: @escaping(String) -> Void) {
+        
+        let universalLink = (args["universalLink"] as? String ?? "")
+        let easyWallet = TPDEasyWallet.setup(withReturUrl: universalLink)
+        easyWallet.onSuccessCallback { (tpPrime) in
+            
+            if let tpPrime = tpPrime {
+                prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"\(tpPrime)\"}")
+            }
+            
+        }.onFailureCallback { (status, message) in
+            
+            failCallBack("{\"status\":\"\(status)\", \"message\":\"\(message)\", \"prime\":\"\"}")
+            
+        }.getPrime()
+        
     }
 }

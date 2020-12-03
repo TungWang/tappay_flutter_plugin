@@ -1,6 +1,6 @@
 # tappayflutterplugin
 
-This is a Flutter plugin that help developer to use Tappay Direct Pay.
+This is a Flutter plugin that help developer to use Tappay.
 
 ## Getting Started
 

@@ -108,4 +108,19 @@ class Tappayflutterplugin {
 
     return PrimeModel.fromJson(json.decode(response));
   }
+
+  //檢查是否有安裝Easy wallet
+  static Future<bool> isEasyWalletAvailable() async {
+    bool response = await _channel.invokeMethod('isEasyWalletAvailable');
+    return response;
+  }
+
+  //取得Easy wallet prime
+  static Future<PrimeModel> getEasyWalletPrime({String universalLink}) async {
+    String response = await _channel.invokeMethod(
+      'getEasyWalletPrime',
+      {'universalLink': universalLink},
+    );
+    return PrimeModel.fromJson(json.decode(response));
+  }
 }
