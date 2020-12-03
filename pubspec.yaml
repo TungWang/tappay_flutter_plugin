@@ -1,7 +1,8 @@
 name: tappayflutterplugin
-description: A new Flutter plugin.
+description: This is a Flutter plugin that help developer to use Tappay Direct Pay.
 version: 0.0.7
-homepage: https://github.com/TungWang
+homepage: https://github.com/TungWang/tappay_flutter_plugin
+repository: https://github.com/TungWang/tappay_flutter_plugin
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
