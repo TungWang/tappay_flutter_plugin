@@ -8,10 +8,9 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import tech.cherri.tpdirect.api.TPDCard
-import tech.cherri.tpdirect.api.TPDCardValidationResult
-import tech.cherri.tpdirect.api.TPDServerType
-import tech.cherri.tpdirect.api.TPDSetup
+import tech.cherri.tpdirect.api.*
+import tech.cherri.tpdirect.callback.TPDEasyWalletGetPrimeSuccessCallback
+import tech.cherri.tpdirect.callback.TPDGetPrimeFailureCallback
 
 /** TappayflutterpluginPlugin */
 public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
@@ -24,7 +23,7 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
   }
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    val channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "tappayflutterplugin")
+    val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "tappayflutterplugin")
     val plugin = flutterPluginBinding.applicationContext
     channel.setMethodCallHandler(TappayflutterpluginPlugin(plugin))
   }
@@ -76,6 +75,39 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
           getPrime(cardNumber, dueMonth, dueYear, ccv, prime = {
             result.success(it)
           }, failCallBack = {
+            result.success(it)
+          })
+        }
+      }
+
+      in "isEasyWalletAvailable" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        }else{
+          result.success(isEasyWalletAvailable())
+        }
+      }
+
+      in "getEasyWalletPrime" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        }else {
+          val universalLink: String? = call.argument("universalLink")
+          getEasyWalletPrime(universalLink, prime = {
+            result.success(it)
+          }, failCallBack = {
+            result.success(it)
+          })
+        }
+      }
+
+      in "redirectToEasyWallet" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        }else{
+          val universalLink: String? = call.argument("universalLink")
+          val paymentUrl: String? = call.argument("paymentUrl")
+          redirectToEasyWallet(universalLink, paymentUrl, callBack = {
             result.success(it)
           })
         }
@@ -146,7 +178,7 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       val dm = StringBuffer(dueMonth)
       val dy = StringBuffer(dueYear)
       val cv = StringBuffer(ccv)
-      val card = TPDCard(context, cn, dm, dy, cv).onSuccessCallback { tpPrime, _, _ ->
+      val card = TPDCard(context, cn, dm, dy, cv).onSuccessCallback { tpPrime, _, _, _ ->
         prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"$tpPrime\"}")
       }.onFailureCallback { status, message ->
         failCallBack("{\"status\":\"$status\", \"message\":\"$message\", \"prime\":\"\"}")
@@ -154,5 +186,33 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       card.createToken("Unknown")
     }
 
+  }
+
+  //檢查是否有安裝Easy wallet
+  private fun isEasyWalletAvailable(): Boolean {
+    return TPDEasyWallet.isAvailable(context)
+  }
+
+  //取得Easy wallet prime
+  private fun getEasyWalletPrime(universalLink: String?, prime: (String) -> (Unit), failCallBack: (String) -> (Unit)) {
+
+    if (universalLink == null) {
+      failCallBack("{\"status\":\"\", \"message\":\"universalLink is null\", \"prime\":\"\"}")
+    }else{
+      val easyWallet = TPDEasyWallet(context, universalLink)
+      easyWallet.getPrime({ tpPrime -> prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"$tpPrime\"}")}, { status, message -> failCallBack("{\"status\":\"$status\", \"message\":\"$message\", \"prime\":\"\"}")})
+    }
+  }
+
+  //重導向至Easy wallet
+  private fun redirectToEasyWallet(universalLink: String?, paymentUrl: String?, callBack: (String) -> (Unit)) {
+
+    if (universalLink == null || paymentUrl == null) {
+      callBack("{\"status\":\"something is null\", \"recTradeId\":\"\", \"orderNumber\":\"\", \"bankTransactionId\":\"\"}")
+    }else{
+      val easyWallet = TPDEasyWallet(context, universalLink)
+      easyWallet.redirectWithUrl(paymentUrl)
+      callBack("{\"status\":\"redirect successfully\", \"recTradeId\":\"\", \"orderNumber\":\"\", \"bankTransactionId\":\"\"}")
+    }
   }
 }

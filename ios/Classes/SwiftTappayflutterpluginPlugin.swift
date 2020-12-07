@@ -45,6 +45,10 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
                 result(message)
             }
             
+        case "redirectToEasyWallet":
+            redirectToEasyWallet(args: args) { (callBack) in
+                result(callBack)
+            }
         default:
             result("iOS " + UIDevice.current.systemVersion)
         }
@@ -128,10 +132,17 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         return TPDEasyWallet.isEasyWalletAvailable()
     }
     
+    
     //取得Easy wallet prime
     fileprivate func getEasyWalletPrime(args: [String:Any], prime: @escaping(String) -> Void, failCallBack: @escaping(String) -> Void) {
         
         let universalLink = (args["universalLink"] as? String ?? "")
+        
+        if (universalLink.isEmpty) {
+            failCallBack("{\"status\":\"\", \"message\":\"universalLink is empty\", \"prime\":\"\"}")
+            return
+        }
+        
         let easyWallet = TPDEasyWallet.setup(withReturUrl: universalLink)
         easyWallet.onSuccessCallback { (tpPrime) in
             
@@ -145,5 +156,17 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
             
         }.getPrime()
         
+    }
+    
+    //重導向至Easy wallet
+    fileprivate func redirectToEasyWallet(args: [String:Any], callBack: @escaping(String) -> Void) {
+        
+        let universalLink = (args["universalLink"] as? String ?? "")
+        let easyWallet = TPDEasyWallet.setup(withReturUrl: universalLink)
+        
+        let paymentUrl = (args["paymentUrl"] as? String ?? "")
+        easyWallet.redirect(paymentUrl) { (result) in
+            callBack("{\"status\":\"\(String(result.status))\", \"recTradeId\":\"\(String(result.recTradeId))\", \"orderNumber\":\"\(String(result.orderNumber))\", \"bankTransactionId\":\"\(String(result.bankTransactionId))\"}")
+        }
     }
 }

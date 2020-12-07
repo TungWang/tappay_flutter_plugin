@@ -30,6 +30,32 @@ class PrimeModel {
   }
 }
 
+class TPDEasyWalletResult {
+  String status;
+  String recTradeId;
+  String orderNumber;
+  String bankTransactionId;
+
+  TPDEasyWalletResult(
+      {this.status, this.recTradeId, this.orderNumber, this.bankTransactionId});
+
+  TPDEasyWalletResult.fromJson(Map<String, dynamic> json) {
+    status = json['status'];
+    recTradeId = json['recTradeId'];
+    orderNumber = json['orderNumber'];
+    bankTransactionId = json['bankTransactionId'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['status'] = this.status;
+    data['recTradeId'] = this.recTradeId;
+    data['orderNumber'] = this.orderNumber;
+    data['bankTransactionId'] = this.bankTransactionId;
+    return data;
+  }
+}
+
 class Tappayflutterplugin {
   static const MethodChannel _channel =
       const MethodChannel('tappayflutterplugin');
@@ -122,5 +148,18 @@ class Tappayflutterplugin {
       {'universalLink': universalLink},
     );
     return PrimeModel.fromJson(json.decode(response));
+  }
+
+  //重導向至EasyWallet
+  static Future<TPDEasyWalletResult> redirectToEasyWallet(
+      {String universalLink, String paymentUrl}) async {
+    TPDEasyWalletResult result = await _channel.invokeMethod(
+      'redirectToEasyWallet',
+      {
+        'universalLink': universalLink,
+        'paymentUrl': paymentUrl,
+      },
+    );
+    return result;
   }
 }

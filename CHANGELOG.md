@@ -1,3 +1,13 @@
+## 0.0.10
+
+* Add Easy Wallet support on android.
+
+## 0.0.9
+
+* Fix build failed.
+* Update Easy wallet method.
+
+
 ## 0.0.8
 
 * Add Easy Wallet support on iOS.

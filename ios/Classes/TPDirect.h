@@ -15,7 +15,7 @@ FOUNDATION_EXPORT const unsigned char TPDirectVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <TPDirect/PublicHeader.h>
 
-#import "TPDirect/TPDSetup.h"
+#import <TPDirect/TPDSetup.h>
 #import <TPDirect/TPDCard.h>
 #import <TPDirect/TPDCardInfo.h>
 #import <TPDirect/TPDForm.h>
