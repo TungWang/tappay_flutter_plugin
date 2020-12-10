@@ -1,3 +1,13 @@
+## 0.0.12
+
+* Update build.gradle.
+
+
+## 0.0.11
+
+* Update build.gradle.
+
+
 ## 0.0.10
 
 * Add Easy Wallet support on android.
