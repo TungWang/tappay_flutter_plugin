@@ -1,3 +1,43 @@
+## 0.0.23
+
+* Fix the conflict with FirebaseApp.
+
+
+## 0.0.22
+
+* Stable version
+
+
+## 0.0.21
+
+* Test
+
+
+## 0.0.20
+
+* Test
+
+
+## 0.0.19
+
+* Test
+
+
+## 0.0.18
+
+* Ensure that import an aar. google-service can't initial normally.
+
+
+## 0.0.17
+
+* Test.
+
+
+## 0.0.16
+
+* Remove android tpdirect.arr to test.
+
+
 ## 0.0.15
 
 * Fix the problem that can't run the android example.

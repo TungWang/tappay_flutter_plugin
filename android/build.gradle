@@ -2,18 +2,14 @@ group 'com.tungwang.tappayflutterplugin'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.3.72'
+    ext.kotlin_version = '1.3.50'
     repositories {
         google()
         jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.1'
+        classpath 'com.android.tools.build:gradle:3.5.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -24,10 +20,6 @@ rootProject.allprojects {
         jcenter()
         flatDir {
             dirs project(':tappayflutterplugin').file('libs')
-        }
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
         }
     }
 }
@@ -54,6 +46,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 //    implementation fileTree(include: ['*.aar'], dir: 'libs')
 //    compileOnly files('libs/tpdirect.aar')
-
     implementation(name: 'tpdirect', ext: 'aar')
 }

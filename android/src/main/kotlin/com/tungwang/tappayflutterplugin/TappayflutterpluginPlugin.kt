@@ -34,7 +34,6 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       val channel = MethodChannel(registrar.messenger(), "tappayflutterplugin")
       val plugin = TappayflutterpluginPlugin(registrar.context())
       channel.setMethodCallHandler(plugin)
-
     }
   }
 
