@@ -1,3 +1,8 @@
+## 0.0.24
+
+* Update TPDirect.framework
+
+
 ## 0.0.23
 
 * Fix the conflict with FirebaseApp.
