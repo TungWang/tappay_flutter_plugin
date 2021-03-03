@@ -1,3 +1,78 @@
+## 0.0.39
+
+* Support EasyWallet in android
+
+
+## 0.0.38
+
+* Fix parseToLinePayResult
+
+
+## 0.0.37
+
+* Fix parseToLinePayResult
+
+
+## 0.0.36
+
+* Support LinePay in android
+
+
+## 0.0.35
+
+* Test
+
+
+## 0.0.34
+
+* Test
+
+
+## 0.0.33
+
+* Test
+
+
+## 0.0.32
+
+* Test
+
+
+## 0.0.31
+
+* Test
+
+
+## 0.0.30
+
+* Test
+
+
+## 0.0.29
+
+* Test
+
+
+## 0.0.28
+
+* Test
+
+
+## 0.0.27
+
+* Update response of 'redirectToEasyWallet' and 'redirectToLinPay'
+
+
+## 0.0.26
+
+* Fix ios can't launch bug
+
+
+## 0.0.25
+
+* Support LinePay
+
+
 ## 0.0.24
 
 * Update TPDirect.framework

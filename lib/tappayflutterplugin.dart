@@ -56,6 +56,32 @@ class TPDEasyWalletResult {
   }
 }
 
+class TPDLinePayResult {
+  String status;
+  String recTradeId;
+  String orderNumber;
+  String bankTransactionId;
+
+  TPDLinePayResult(
+      {this.status, this.recTradeId, this.orderNumber, this.bankTransactionId});
+
+  TPDLinePayResult.fromJson(Map<String, dynamic> json) {
+    status = json['status'];
+    recTradeId = json['recTradeId'];
+    orderNumber = json['orderNumber'];
+    bankTransactionId = json['bankTransactionId'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['status'] = this.status;
+    data['recTradeId'] = this.recTradeId;
+    data['orderNumber'] = this.orderNumber;
+    data['bankTransactionId'] = this.bankTransactionId;
+    return data;
+  }
+}
+
 class Tappayflutterplugin {
   static const MethodChannel _channel =
       const MethodChannel('tappayflutterplugin');
@@ -153,13 +179,95 @@ class Tappayflutterplugin {
   //重導向至EasyWallet
   static Future<TPDEasyWalletResult> redirectToEasyWallet(
       {String universalLink, String paymentUrl}) async {
-    TPDEasyWalletResult result = await _channel.invokeMethod(
+    String result = await _channel.invokeMethod(
       'redirectToEasyWallet',
       {
         'universalLink': universalLink,
         'paymentUrl': paymentUrl,
       },
     );
-    return result;
+    return TPDEasyWalletResult.fromJson(json.decode(result));
+  }
+
+  //解析Easy wallet result
+  static Future<void> parseToEasyWalletResult({String universalLink, String uri}) async {
+    await _channel.invokeMethod(
+      'parseToEasyWalletResult',
+      {
+        'universalLink': universalLink,
+        'uri': uri,
+      },
+    );
+    return;
+  }
+
+  //取得Easy wallet result
+  static Future<TPDEasyWalletResult> getEasyWalletResult() async {
+    String result = await _channel.invokeMethod(
+      'getEasyWalletResult',
+    );
+
+    try {
+      return TPDEasyWalletResult.fromJson(json.decode(result));
+    } catch (e) {
+      print(e);
+      print(result);
+      return null;
+    }
+  }
+
+  //檢查是否有安裝LinePay
+  static Future<bool> isLinePayAvailable() async {
+    bool response = await _channel.invokeMethod('isLinePayAvailable');
+    return response;
+  }
+
+  //取得Line pay prime
+  static Future<PrimeModel> getLinePayPrime({String universalLink}) async {
+    String response = await _channel.invokeMethod(
+      'getLinePayPrime',
+      {'universalLink': universalLink},
+    );
+    return PrimeModel.fromJson(json.decode(response));
+  }
+
+  //重導向至LinePay
+  static Future<TPDLinePayResult> redirectToLinePay(
+      {String universalLink, String paymentUrl}) async {
+    String result = await _channel.invokeMethod(
+      'redirectToLinePay',
+      {
+        'universalLink': universalLink,
+        'paymentUrl': paymentUrl,
+      },
+    );
+    return TPDLinePayResult.fromJson(json.decode(result));
+  }
+
+  //解析line pay result
+  static Future<void> parseToLinePayResult({String universalLink, String uri}) async {
+    await _channel.invokeMethod(
+      'parseToLinePayResult',
+      {
+        'universalLink': universalLink,
+        'uri': uri,
+      },
+    );
+    return;
+  }
+
+  //取得line pay result
+  static Future<TPDLinePayResult> getLinePayResult() async {
+    String result = await _channel.invokeMethod(
+      'getLinePayResult',
+    );
+
+    try {
+      return TPDLinePayResult.fromJson(json.decode(result));
+    } catch (e) {
+      print(e);
+      print(result);
+      return null;
+    }
   }
 }

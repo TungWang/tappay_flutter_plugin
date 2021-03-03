@@ -49,6 +49,21 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
             redirectToEasyWallet(args: args) { (callBack) in
                 result(callBack)
             }
+            
+        case "isLinePayAvailable":
+            result(isLinePayAvailable())
+            
+        case "getLinePayPrime":
+            getLinePayPrime(args: args) { (prime) in
+                result(prime)
+            } failCallBack: { (message) in
+                result(message)
+            }
+            
+        case "redirectToLinePay":
+            redirectToLinePay(args: args) { (callBack) in
+                result(callBack)
+            }
         default:
             result("iOS " + UIDevice.current.systemVersion)
         }
@@ -166,6 +181,50 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         
         let paymentUrl = (args["paymentUrl"] as? String ?? "")
         easyWallet.redirect(paymentUrl) { (result) in
+            callBack("{\"status\":\"\(String(result.status))\", \"recTradeId\":\"\(String(result.recTradeId))\", \"orderNumber\":\"\(String(result.orderNumber))\", \"bankTransactionId\":\"\(String(result.bankTransactionId))\"}")
+        }
+    }
+    
+    //檢查是否有安裝Line pay
+    fileprivate func isLinePayAvailable() -> Bool {
+        return TPDLinePay.isLinePayAvailable()
+    }
+    
+    
+    //取得line pay prime
+    fileprivate func getLinePayPrime(args: [String:Any], prime: @escaping(String) -> Void, failCallBack: @escaping(String) -> Void) {
+        
+        let universalLink = (args["universalLink"] as? String ?? "")
+        
+        if (universalLink.isEmpty) {
+            failCallBack("{\"status\":\"\", \"message\":\"universalLink is empty\", \"prime\":\"\"}")
+            return
+        }
+        
+        let linePay = TPDLinePay.setup(withReturnUrl: universalLink)
+        linePay.onSuccessCallback { (tpPrime) in
+            
+            if let tpPrime = tpPrime {
+                prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"\(tpPrime)\"}")
+            }
+            
+        }.onFailureCallback { (status, message) in
+            
+            failCallBack("{\"status\":\"\(status)\", \"message\":\"\(message)\", \"prime\":\"\"}")
+            
+        }.getPrime()
+        
+    }
+    
+    //重導向至line pay
+    fileprivate func redirectToLinePay(args: [String:Any], callBack: @escaping(String) -> Void) {
+        
+        let universalLink = (args["universalLink"] as? String ?? "")
+        let linePay = TPDLinePay.setup(withReturnUrl: universalLink)
+        
+        let paymentUrl = (args["paymentUrl"] as? String ?? "")
+        guard let vc = UIApplication.shared.delegate?.window??.rootViewController else { return }
+        linePay.redirect(paymentUrl, with: vc) { (result) in
             callBack("{\"status\":\"\(String(result.status))\", \"recTradeId\":\"\(String(result.recTradeId))\", \"orderNumber\":\"\(String(result.orderNumber))\", \"bankTransactionId\":\"\(String(result.bankTransactionId))\"}")
         }
     }

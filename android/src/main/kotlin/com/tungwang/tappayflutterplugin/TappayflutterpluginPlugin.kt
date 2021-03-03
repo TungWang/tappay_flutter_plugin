@@ -1,7 +1,8 @@
 package com.tungwang.tappayflutterplugin
 
 import android.content.Context
-import androidx.annotation.NonNull;
+import android.net.Uri
+import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -9,12 +10,12 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import tech.cherri.tpdirect.api.*
-import tech.cherri.tpdirect.callback.TPDEasyWalletGetPrimeSuccessCallback
-import tech.cherri.tpdirect.callback.TPDGetPrimeFailureCallback
 
 /** TappayflutterpluginPlugin */
-public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
+class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
   private var context: Context? = null
+  private var tpdLinePayResultListenerInterface: TPDLinePayResultListenerInterface = TPDLinePayResultListenerInterface()
+  private var tpdEasyWalletResultListenerInterface: TPDEasyWalletResultListenerInterface = TPDEasyWalletResultListenerInterface()
 
   constructor()
 
@@ -43,18 +44,18 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       in "setupTappay" -> {
         if (context == null) {
           result.error("", "context is null", "")
-        }else{
+        } else {
           val appId: Int? = call.argument("appId")
           val appKey: String? = call.argument("appKey")
           val serverType: String? = call.argument("serverType")
-          setupTappay(appId, appKey, serverType, errorMessage = {result.error("", it, "")})
+          setupTappay(appId, appKey, serverType, errorMessage = { result.error("", it, "") })
         }
       }
 
       in "isCardValid" -> {
         if (context == null) {
           result.error("", "context is null", "")
-        }else{
+        } else {
           val cardNumber: String? = call.argument("cardNumber")
           val dueMonth: String? = call.argument("dueMonth")
           val dueYear: String? = call.argument("dueYear")
@@ -66,7 +67,7 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       in "getPrime" -> {
         if (context == null) {
           result.error("", "context is null", "")
-        }else{
+        } else {
           val cardNumber: String? = call.argument("cardNumber")
           val dueMonth: String? = call.argument("dueMonth")
           val dueYear: String? = call.argument("dueYear")
@@ -82,7 +83,7 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       in "isEasyWalletAvailable" -> {
         if (context == null) {
           result.error("", "context is null", "")
-        }else{
+        } else {
           result.success(isEasyWalletAvailable())
         }
       }
@@ -90,7 +91,7 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       in "getEasyWalletPrime" -> {
         if (context == null) {
           result.error("", "context is null", "")
-        }else {
+        } else {
           val universalLink: String? = call.argument("universalLink")
           getEasyWalletPrime(universalLink, prime = {
             result.success(it)
@@ -103,12 +104,93 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       in "redirectToEasyWallet" -> {
         if (context == null) {
           result.error("", "context is null", "")
-        }else{
+        } else {
           val universalLink: String? = call.argument("universalLink")
           val paymentUrl: String? = call.argument("paymentUrl")
           redirectToEasyWallet(universalLink, paymentUrl, callBack = {
             result.success(it)
           })
+        }
+      }
+
+      in "parseToEasyWalletResult" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        } else {
+          val universalLink: String? = call.argument("universalLink")
+          val uri: String? = call.argument("uri")
+          parseToEasyWalletResult(universalLink, uri, failCallBack = {
+            result.success(it)
+          }, successCallBack = {
+            result.success(it)
+          })
+        }
+      }
+
+      in "getEasyWalletResult" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        } else {
+          getEasyWalletResult {
+            result.success(it)
+          }
+        }
+      }
+
+      in "isLinePayAvailable" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        } else {
+          result.success(isLinePayAvailable())
+        }
+      }
+
+      in "getLinePayPrime" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        } else {
+          val universalLink: String? = call.argument("universalLink")
+          getLinePayPrime(universalLink, prime = {
+            result.success(it)
+          }, failCallBack = {
+            result.success(it)
+          })
+        }
+      }
+
+      in "redirectToLinePay" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        } else {
+          val universalLink: String? = call.argument("universalLink")
+          val paymentUrl: String? = call.argument("paymentUrl")
+          redirectToLinePay(universalLink, paymentUrl, callBack = {
+            result.success(it)
+          })
+        }
+      }
+
+      in "parseToLinePayResult" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        } else {
+          val universalLink: String? = call.argument("universalLink")
+          val uri: String? = call.argument("uri")
+          parseToLinePayResult(universalLink, uri, failCallBack = {
+            result.success(it)
+          }, successCallBack = {
+            result.success(it)
+          })
+        }
+      }
+
+      in "getLinePayResult" -> {
+        if (context == null) {
+          result.error("", "context is null", "")
+        } else {
+          getLinePayResult {
+            result.success(it)
+          }
         }
       }
     }
@@ -199,7 +281,7 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       failCallBack("{\"status\":\"\", \"message\":\"universalLink is null\", \"prime\":\"\"}")
     }else{
       val easyWallet = TPDEasyWallet(context, universalLink)
-      easyWallet.getPrime({ tpPrime -> prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"$tpPrime\"}")}, { status, message -> failCallBack("{\"status\":\"$status\", \"message\":\"$message\", \"prime\":\"\"}")})
+      easyWallet.getPrime({ tpPrime -> prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"$tpPrime\"}") }, { status, message -> failCallBack("{\"status\":\"$status\", \"message\":\"$message\", \"prime\":\"\"}") })
     }
   }
 
@@ -212,6 +294,78 @@ public class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler {
       val easyWallet = TPDEasyWallet(context, universalLink)
       easyWallet.redirectWithUrl(paymentUrl)
       callBack("{\"status\":\"redirect successfully\", \"recTradeId\":\"\", \"orderNumber\":\"\", \"bankTransactionId\":\"\"}")
+    }
+  }
+
+  //解析East wallet result
+  private fun parseToEasyWalletResult(universalLink: String?, uri: String?, failCallBack: (String) -> (Unit), successCallBack: (String) -> (Unit)) {
+
+    if (universalLink == null || uri == null) {
+      failCallBack("{\"message\":\"universalLink or uri is null\"}")
+    }else{
+      val easyWallet = TPDEasyWallet(context, universalLink)
+      val parsedUri = Uri.parse(uri)
+      easyWallet.parseToEasyWalletResult(context, parsedUri, this.tpdEasyWalletResultListenerInterface)
+      successCallBack("Wait for EasyWallet result")
+    }
+  }
+
+  //取得line pay result
+  private fun getEasyWalletResult(result: (String) -> (Unit)) {
+    if (tpdEasyWalletResultListenerInterface.successResult == null) {
+      tpdEasyWalletResultListenerInterface.failResult?.let { result(it) }
+    } else {
+      tpdEasyWalletResultListenerInterface.successResult?.let { result(it) }
+    }
+  }
+
+  //檢查是否有安裝line pay
+  private fun isLinePayAvailable(): Boolean {
+    return TPDLinePay.isLinePayAvailable(context)
+  }
+
+  //取得line pay prime
+  private fun getLinePayPrime(universalLink: String?, prime: (String) -> (Unit), failCallBack: (String) -> (Unit)) {
+
+    if (universalLink == null) {
+      failCallBack("{\"status\":\"\", \"message\":\"universalLink is null\", \"prime\":\"\"}")
+    }else{
+      val linePay = TPDLinePay(context, universalLink)
+      linePay.getPrime({ tpPrime -> prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"$tpPrime\"}") }, { status, message -> failCallBack("{\"status\":\"$status\", \"message\":\"$message\", \"prime\":\"\"}") })
+    }
+  }
+
+  //重導向至line pay
+  private fun redirectToLinePay(universalLink: String?, paymentUrl: String?, callBack: (String) -> (Unit)) {
+
+    if (universalLink == null || paymentUrl == null) {
+      callBack("{\"status\":\"something is null\", \"recTradeId\":\"\", \"orderNumber\":\"\", \"bankTransactionId\":\"\"}")
+    }else{
+      val linePay = TPDLinePay(context, universalLink)
+      linePay.redirectWithUrl(paymentUrl)
+      callBack("{\"status\":\"redirect successfully\", \"recTradeId\":\"\", \"orderNumber\":\"\", \"bankTransactionId\":\"\"}")
+    }
+  }
+
+  //解析line pay result
+  private fun parseToLinePayResult(universalLink: String?, uri: String?, failCallBack: (String) -> (Unit), successCallBack: (String) -> (Unit)) {
+
+    if (universalLink == null || uri == null) {
+      failCallBack("{\"message\":\"universalLink or uri is null\"}")
+    }else{
+      val linePay = TPDLinePay(context, universalLink)
+      val parsedUri = Uri.parse(uri)
+      linePay.parseToLinePayResult(context, parsedUri, this.tpdLinePayResultListenerInterface)
+      successCallBack("Wait for LinePay result")
+    }
+  }
+
+  //取得line pay result
+  private fun getLinePayResult(result: (String) -> (Unit)) {
+    if (tpdLinePayResultListenerInterface.successResult == null) {
+      tpdLinePayResultListenerInterface.failResult?.let { result(it) }
+    } else {
+      tpdLinePayResultListenerInterface.successResult?.let { result(it) }
     }
   }
 }
