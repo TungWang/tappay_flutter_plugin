@@ -4,11 +4,55 @@ import TPDirect
 import AdSupport
 
 public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "tappayflutterplugin", binaryMessenger: registrar.messenger())
         let instance = SwiftTappayflutterpluginPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
+        registrar.addApplicationDelegate(instance)
     }
+    
+    public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [AnyHashable : Any] = [:]) -> Bool {
+        TPDLinePay.addExceptionObserver(#selector(tappayLinePayExceptionHandler(notofication:)))
+        TPDEasyWallet.addExceptionObserver(#selector(tappayEasyWalletExceptionHandler(notofication:)))
+        return true
+    }
+    
+    public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        let tapPayHandled = TPDLinePay.handle(url)
+        if (tapPayHandled) {
+            return true
+        }
+        
+        return false
+    }
+    
+    public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]) -> Void) -> Bool {
+        if let url = userActivity.webpageURL {
+            let easyWalletHandled = TPDEasyWallet.handleUniversalLink(url)
+            if (easyWalletHandled) {
+                return true
+            }
+        }
+        return true
+    }
+    
+    @objc func tappayLinePayExceptionHandler(notofication: Notification) {
+        
+        let result : TPDLinePayResult = TPDLinePay.parseURL(notofication)
+        
+        print("status : \(result.status) , orderNumber : \(result.orderNumber) , recTradeid : \(result.recTradeId) , bankTransactionId : \(result.bankTransactionId) ")
+        
+    }
+    
+    @objc func tappayEasyWalletExceptionHandler(notofication: Notification) {
+        
+        let result : TPDEasyWalletResult = TPDEasyWallet.parseURL(notofication)
+        
+        print("status : \(result.status) , orderNumber : \(result.orderNumber) , recTradeid : \(result.recTradeId) , bankTransactionId : \(result.bankTransactionId) ")
+        
+    }
+    
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
@@ -187,7 +231,8 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
     
     //檢查是否有安裝Line pay
     fileprivate func isLinePayAvailable() -> Bool {
-        return TPDLinePay.isLinePayAvailable()
+        let result = TPDLinePay.isLinePayAvailable()
+        return result
     }
     
     
@@ -223,7 +268,13 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         let linePay = TPDLinePay.setup(withReturnUrl: universalLink)
         
         let paymentUrl = (args["paymentUrl"] as? String ?? "")
+        
+//        let rootViewController = UIApplication.shared.windows.filter({ (w) -> Bool in
+//                    return w.isHidden == false
+//         }).first?.rootViewController
+        
         guard let vc = UIApplication.shared.delegate?.window??.rootViewController else { return }
+        
         linePay.redirect(paymentUrl, with: vc) { (result) in
             callBack("{\"status\":\"\(String(result.status))\", \"recTradeId\":\"\(String(result.recTradeId))\", \"orderNumber\":\"\(String(result.orderNumber))\", \"bankTransactionId\":\"\(String(result.bankTransactionId))\"}")
         }

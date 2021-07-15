@@ -8,6 +8,10 @@ enum TappayServerType {
   production,
 }
 
+enum TPDCardType { unknown, visa, masterCard, jcb, americanExpress, unionPay }
+
+enum TPDCardAuthMethod { panOnly, cryptogram3ds }
+
 class PrimeModel {
   String status;
   String message;
@@ -163,7 +167,7 @@ class Tappayflutterplugin {
 
   //檢查是否有安裝Easy wallet
   static Future<bool> isEasyWalletAvailable() async {
-    bool response = await _channel.invokeMethod('isEasyWalletAvailable');
+    bool response = await _channel.invokeMethod('isEasyWalletAvailable', {});
     return response;
   }
 
@@ -190,7 +194,8 @@ class Tappayflutterplugin {
   }
 
   //解析Easy wallet result
-  static Future<void> parseToEasyWalletResult({String universalLink, String uri}) async {
+  static Future<void> parseToEasyWalletResult(
+      {String universalLink, String uri}) async {
     await _channel.invokeMethod(
       'parseToEasyWalletResult',
       {
@@ -218,7 +223,7 @@ class Tappayflutterplugin {
 
   //檢查是否有安裝LinePay
   static Future<bool> isLinePayAvailable() async {
-    bool response = await _channel.invokeMethod('isLinePayAvailable');
+    var response = await _channel.invokeMethod('isLinePayAvailable', {});
     return response;
   }
 
@@ -245,7 +250,8 @@ class Tappayflutterplugin {
   }
 
   //解析line pay result
-  static Future<void> parseToLinePayResult({String universalLink, String uri}) async {
+  static Future<void> parseToLinePayResult(
+      {String universalLink, String uri}) async {
     await _channel.invokeMethod(
       'parseToLinePayResult',
       {
@@ -269,5 +275,84 @@ class Tappayflutterplugin {
       print(result);
       return null;
     }
+  }
+
+  //GooglePay prepare payment data
+  static Future<void> preparePaymentData(
+      {List<TPDCardType> allowedNetworks,
+      List<TPDCardAuthMethod> allowedAuthMethods,
+      String merchantName,
+      bool isPhoneNumberRequired,
+      bool isShippingAddressRequired,
+      bool isEmailRequired}) async {
+    List<int> networks = [];
+    for (var i in allowedNetworks) {
+      int value;
+      switch (i) {
+        case TPDCardType.unknown:
+          value = 0;
+          break;
+        case TPDCardType.visa:
+          value = 2;
+          break;
+        case TPDCardType.masterCard:
+          value = 3;
+          break;
+        case TPDCardType.jcb:
+          value = 1;
+          break;
+        case TPDCardType.americanExpress:
+          value = 4;
+          break;
+        case TPDCardType.unionPay:
+          value = 5;
+          break;
+      }
+      networks.add(value);
+    }
+
+    List<int> methods = [];
+    for (var i in allowedAuthMethods) {
+      int value;
+      switch (i) {
+        case TPDCardAuthMethod.panOnly:
+          value = 0;
+          break;
+        case TPDCardAuthMethod.cryptogram3ds:
+          value = 1;
+          break;
+      }
+      methods.add(value);
+    }
+
+    await _channel.invokeMethod(
+      'preparePaymentData',
+      {
+        'allowedNetworks': networks,
+        'allowedAuthMethods': methods,
+        'merchantName': merchantName,
+        'isPhoneNumberRequired': isPhoneNumberRequired,
+        'isShippingAddressRequired': isShippingAddressRequired,
+        'isEmailRequired': isEmailRequired,
+      },
+    );
+    return;
+  }
+
+  //request google pay payment data
+  static Future<void> requestPaymentData(
+      String totalPrice, String currencyCode) async {
+    await _channel.invokeMethod(
+      'requestPaymentData',
+      {
+        'totalPrice': totalPrice,
+        'currencyCode': currencyCode,
+      },
+    );
+  }
+
+  //Get google pay prime
+  static Future<void> getGooglePayPrime() async {
+    await _channel.invokeMethod('getGooglePayPrime');
   }
 }

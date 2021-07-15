@@ -1,3 +1,48 @@
+## 0.0.48
+
+* Support Google pay
+
+
+## 0.0.47
+
+* Test
+
+
+## 0.0.46
+
+* Test
+
+
+## 0.0.45
+
+* Test
+
+
+## 0.0.44
+
+* Test
+
+
+## 0.0.43
+
+* Test
+
+
+## 0.0.42
+
+* Test
+
+
+## 0.0.41
+
+* Test
+
+
+## 0.0.40
+
+* Support GooglePay
+
+
 ## 0.0.39
 
 * Support EasyWallet in android
