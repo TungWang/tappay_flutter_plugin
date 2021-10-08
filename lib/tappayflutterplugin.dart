@@ -13,9 +13,9 @@ enum TPDCardType { unknown, visa, masterCard, jcb, americanExpress, unionPay }
 enum TPDCardAuthMethod { panOnly, cryptogram3ds }
 
 class PrimeModel {
-  String status;
-  String message;
-  String prime;
+  String? status;
+  String? message;
+  String? prime;
 
   PrimeModel({this.status, this.message, this.prime});
 
@@ -35,10 +35,10 @@ class PrimeModel {
 }
 
 class TPDEasyWalletResult {
-  String status;
-  String recTradeId;
-  String orderNumber;
-  String bankTransactionId;
+  String? status;
+  String? recTradeId;
+  String? orderNumber;
+  String? bankTransactionId;
 
   TPDEasyWalletResult(
       {this.status, this.recTradeId, this.orderNumber, this.bankTransactionId});
@@ -61,10 +61,10 @@ class TPDEasyWalletResult {
 }
 
 class TPDLinePayResult {
-  String status;
-  String recTradeId;
-  String orderNumber;
-  String bankTransactionId;
+  String? status;
+  String? recTradeId;
+  String? orderNumber;
+  String? bankTransactionId;
 
   TPDLinePayResult(
       {this.status, this.recTradeId, this.orderNumber, this.bankTransactionId});
@@ -97,10 +97,10 @@ class Tappayflutterplugin {
 
   //設置Tappay環境
   static Future<void> setupTappay({
-    int appId,
-    String appKey,
-    TappayServerType serverType,
-    Function(String) errorMessage,
+    required int appId,
+    required String appKey,
+    required TappayServerType serverType,
+    required Function(String) errorMessage,
   }) async {
     String st = '';
     switch (serverType) {
@@ -112,7 +112,7 @@ class Tappayflutterplugin {
         break;
     }
 
-    final String error = await _channel.invokeMethod(
+    final String? error = await _channel.invokeMethod(
       'setupTappay',
       {
         'appId': appId,
@@ -128,10 +128,10 @@ class Tappayflutterplugin {
 
   //檢查信用卡的有效性
   static Future<bool> isCardValid({
-    String cardNumber,
-    String dueMonth,
-    String dueYear,
-    String ccv,
+    required String cardNumber,
+    required String dueMonth,
+    required String dueYear,
+    required String ccv,
   }) async {
     final bool isValid = await _channel.invokeMethod(
       'isCardValid',
@@ -147,10 +147,10 @@ class Tappayflutterplugin {
 
   //取得Prime
   static Future<PrimeModel> getPrime({
-    String cardNumber,
-    String dueMonth,
-    String dueYear,
-    String ccv,
+    required String cardNumber,
+    required String dueMonth,
+    required String dueYear,
+    required String ccv,
   }) async {
     String response = await _channel.invokeMethod(
       'getPrime',
@@ -172,7 +172,8 @@ class Tappayflutterplugin {
   }
 
   //取得Easy wallet prime
-  static Future<PrimeModel> getEasyWalletPrime({String universalLink}) async {
+  static Future<PrimeModel> getEasyWalletPrime(
+      {required String universalLink}) async {
     String response = await _channel.invokeMethod(
       'getEasyWalletPrime',
       {'universalLink': universalLink},
@@ -182,7 +183,7 @@ class Tappayflutterplugin {
 
   //重導向至EasyWallet
   static Future<TPDEasyWalletResult> redirectToEasyWallet(
-      {String universalLink, String paymentUrl}) async {
+      {required String universalLink, required String paymentUrl}) async {
     String result = await _channel.invokeMethod(
       'redirectToEasyWallet',
       {
@@ -195,7 +196,7 @@ class Tappayflutterplugin {
 
   //解析Easy wallet result
   static Future<void> parseToEasyWalletResult(
-      {String universalLink, String uri}) async {
+      {required String universalLink, required String uri}) async {
     await _channel.invokeMethod(
       'parseToEasyWalletResult',
       {
@@ -207,7 +208,7 @@ class Tappayflutterplugin {
   }
 
   //取得Easy wallet result
-  static Future<TPDEasyWalletResult> getEasyWalletResult() async {
+  static Future<TPDEasyWalletResult?> getEasyWalletResult() async {
     String result = await _channel.invokeMethod(
       'getEasyWalletResult',
     );
@@ -228,7 +229,8 @@ class Tappayflutterplugin {
   }
 
   //取得Line pay prime
-  static Future<PrimeModel> getLinePayPrime({String universalLink}) async {
+  static Future<PrimeModel> getLinePayPrime(
+      {required String universalLink}) async {
     String response = await _channel.invokeMethod(
       'getLinePayPrime',
       {'universalLink': universalLink},
@@ -238,7 +240,7 @@ class Tappayflutterplugin {
 
   //重導向至LinePay
   static Future<TPDLinePayResult> redirectToLinePay(
-      {String universalLink, String paymentUrl}) async {
+      {required String universalLink, required String paymentUrl}) async {
     String result = await _channel.invokeMethod(
       'redirectToLinePay',
       {
@@ -251,7 +253,7 @@ class Tappayflutterplugin {
 
   //解析line pay result
   static Future<void> parseToLinePayResult(
-      {String universalLink, String uri}) async {
+      {required String universalLink, required String uri}) async {
     await _channel.invokeMethod(
       'parseToLinePayResult',
       {
@@ -263,7 +265,7 @@ class Tappayflutterplugin {
   }
 
   //取得line pay result
-  static Future<TPDLinePayResult> getLinePayResult() async {
+  static Future<TPDLinePayResult?> getLinePayResult() async {
     String result = await _channel.invokeMethod(
       'getLinePayResult',
     );
@@ -278,13 +280,14 @@ class Tappayflutterplugin {
   }
 
   //GooglePay prepare payment data
-  static Future<void> preparePaymentData(
-      {List<TPDCardType> allowedNetworks,
-      List<TPDCardAuthMethod> allowedAuthMethods,
-      String merchantName,
-      bool isPhoneNumberRequired,
-      bool isShippingAddressRequired,
-      bool isEmailRequired}) async {
+  static Future<void> preparePaymentData({
+    required List<TPDCardType> allowedNetworks,
+    required List<TPDCardAuthMethod> allowedAuthMethods,
+    required String merchantName,
+    required bool isPhoneNumberRequired,
+    required bool isShippingAddressRequired,
+    required bool isEmailRequired,
+  }) async {
     List<int> networks = [];
     for (var i in allowedNetworks) {
       int value;

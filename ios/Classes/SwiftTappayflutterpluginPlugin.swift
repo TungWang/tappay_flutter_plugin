@@ -41,7 +41,7 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         
         let result : TPDLinePayResult = TPDLinePay.parseURL(notofication)
         
-        print("status : \(result.status) , orderNumber : \(result.orderNumber) , recTradeid : \(result.recTradeId) , bankTransactionId : \(result.bankTransactionId) ")
+        print("status : \(result.status) , orderNumber : \(result.orderNumber ?? "") , recTradeid : \(result.recTradeId ?? "") , bankTransactionId : \(result.bankTransactionId ?? "") ")
         
     }
     
@@ -49,7 +49,7 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         
         let result : TPDEasyWalletResult = TPDEasyWallet.parseURL(notofication)
         
-        print("status : \(result.status) , orderNumber : \(result.orderNumber) , recTradeid : \(result.recTradeId) , bankTransactionId : \(result.bankTransactionId) ")
+        print("status : \(result.status) , orderNumber : \(result.orderNumber ?? "") , recTradeid : \(result.recTradeId ?? "") , bankTransactionId : \(result.bankTransactionId ?? "") ")
         
     }
     
@@ -146,8 +146,8 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         
         
         TPDSetup.setWithAppId(appId, withAppKey: appKey, with: st)
-        TPDSetup.shareInstance().setupIDFA(ASIdentifierManager.shared().advertisingIdentifier.uuidString)
-        TPDSetup.shareInstance().serverSync()
+//        TPDSetup.shareInstance().setupIDFA(ASIdentifierManager.shared().advertisingIdentifier.uuidString)
+//        TPDSetup.shareInstance().serverSync()
     }
     
     //檢查信用卡的有效性

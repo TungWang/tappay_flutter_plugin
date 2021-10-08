@@ -1,3 +1,8 @@
+## 0.0.49
+
+* Support null safety
+* Update tappay iOS SDK to v2.13.0
+
 ## 0.0.48
 
 * Support Google pay
