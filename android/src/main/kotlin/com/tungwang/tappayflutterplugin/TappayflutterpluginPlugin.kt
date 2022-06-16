@@ -54,15 +54,15 @@ class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
-    TODO("Not yet implemented")
+//    TODO("Not yet implemented")
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-    TODO("Not yet implemented")
+//    TODO("Not yet implemented")
   }
 
   override fun onDetachedFromActivity() {
-    TODO("Not yet implemented")
+//    TODO("Not yet implemented")
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
