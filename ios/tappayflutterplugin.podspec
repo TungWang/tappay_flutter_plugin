@@ -22,4 +22,5 @@ A new Flutter plugin.
   s.swift_version = '5.0'
   s.vendored_frameworks = 'TPDirect.framework', 'WebKit.framework', 'SafariServices.framework'
   s.resources         = "TPDirectResource/Image/*"
+  s.frameworks = 'WebKit', 'SafariServices'
 end
