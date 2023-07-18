@@ -1,12 +1,11 @@
 name: tappayflutterplugin
 description: This is a Flutter plugin that help developer to use Tappay.
-version: 0.0.49
+version: 0.1.0
 homepage: https://github.com/TungWang/tappay_flutter_plugin
 repository: https://github.com/TungWang/tappay_flutter_plugin
 
 environment:
-  sdk: ">=2.14.0 <3.0.0"
-  flutter: ">=2.5.0"
+  sdk: '>=2.18.0 <3.0.0'
 
 dependencies:
   flutter:

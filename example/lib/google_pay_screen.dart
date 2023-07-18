@@ -37,8 +37,8 @@ class _GooglePayScreenState extends State<GooglePayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
-              onPressed: () {
+            child: InkWell(
+              onTap: () {
                 Tappayflutterplugin.setupTappay(
                     appId: appId,
                     appKey: appKey,
@@ -52,8 +52,8 @@ class _GooglePayScreenState extends State<GooglePayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
-              onPressed: () {
+            child: InkWell(
+              onTap: () {
                 Tappayflutterplugin.preparePaymentData(
                   allowedNetworks: [
                     TPDCardType.masterCard,
@@ -72,8 +72,8 @@ class _GooglePayScreenState extends State<GooglePayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
-              onPressed: () async {
+            child: InkWell(
+              onTap: () async {
                 await Tappayflutterplugin.requestPaymentData('100', 'TWD');
               },
               child: Text('Request payment data'),
@@ -81,8 +81,8 @@ class _GooglePayScreenState extends State<GooglePayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
-              onPressed: () async {
+            child: InkWell(
+              onTap: () async {
                 await Tappayflutterplugin.getGooglePayPrime();
               },
               child: Text('Get google pay prime'),

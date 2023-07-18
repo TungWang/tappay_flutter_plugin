@@ -9,7 +9,6 @@ class DirectPayScreen extends StatefulWidget {
 }
 
 class _DirectPayScreenState extends State<DirectPayScreen> {
-
   //Test card number
   String cardNumber = '4242424242424242';
   String dueMonth = '01';
@@ -40,8 +39,8 @@ class _DirectPayScreenState extends State<DirectPayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
-              onPressed: () {
+            child: InkWell(
+              onTap: () {
                 Tappayflutterplugin.setupTappay(
                     appId: appId,
                     appKey: appKey,
@@ -71,8 +70,8 @@ class _DirectPayScreenState extends State<DirectPayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
-              onPressed: () async {
+            child: InkWell(
+              onTap: () async {
                 var isCardValid = await Tappayflutterplugin.isCardValid(
                   cardNumber: cardNumber,
                   dueMonth: dueMonth,
@@ -86,15 +85,15 @@ class _DirectPayScreenState extends State<DirectPayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
-              onPressed: () async {
+            child: InkWell(
+              onTap: () async {
                 PrimeModel prime = await Tappayflutterplugin.getPrime(
                   cardNumber: cardNumber,
                   dueMonth: dueMonth,
                   dueYear: dueYear,
                   ccv: ccv,
                 );
-                if (prime.prime.isEmpty) {
+                if ((prime.prime ?? '').isEmpty) {
                   print('status: ${prime.status}, message: ${prime.message}');
                 } else {
                   print('prime: ${prime.prime}');
